@@ -34,10 +34,13 @@ jobs:
         with:
           node-version: 18.x
           cache: yarn
+          cache-dependency-path: the-site/yarn.lock
       - name: Install dependencies
         run: yarn install --frozen-lockfile --non-interactive
+        working-directory: ./the-site
       - name: Build
         run: yarn build
+        working-directory: ./the-site
       # 👆 Build steps
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -45,7 +48,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # 👇 Specify build output path
-          path: build
+          path: the-site/build
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
