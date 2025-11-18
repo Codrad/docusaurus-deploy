@@ -33,13 +33,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18.x
-          cache: yarn
-          cache-dependency-path: the-site/yarn.lock
+          cache: npm
+          cache-dependency-path: the-site/package-lock.json
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --non-interactive
+        run: npm ci
         working-directory: ./the-site
       - name: Build
-        run: yarn build
+        run: npm run build
         working-directory: ./the-site
       # 👆 Build steps
       - name: Setup Pages
