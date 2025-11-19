@@ -9,4 +9,5 @@ Welcome to the Documentation
    goodbye
 
 This is a simple documentation site.
+Some extra text
 
