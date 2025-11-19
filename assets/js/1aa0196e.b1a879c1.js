@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkthe_site=globalThis.webpackChunkthe_site||[]).push([[7771],{9555:e=>{e.exports=JSON.parse('{"metadata":{"permalink":"/docusaurus-deploy/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":4,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
