@@ -1,0 +1,57 @@
+name: sphinx-preview
+
+on: 
+  push:
+    branches: [sphinx-preview]
+  workflow_dispatch:
+
+jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Required permissions
+    permissions: read-all
+    outputs:
+      requirements : ${{ steps.filter.outputs.requirements }}
+      workflow : ${{ steps.filter.outputs.workflow }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+            requirements: Requirements/**
+            workflow: .github/workflows/sphinx-preview.yaml
+  build-requirements-preview:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: |
+      needs.changes.outputs.requirements == 'true' ||
+      needs.changes.outputs.workflow == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: Setup Graphviz
+        uses: tlylt/install-graphviz@v1
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - name: Build
+        run: |
+          python -m venv env &&
+          source env/bin/activate &&
+          echo "VIRTUAL ENV:" $VIRTUAL_ENV &&
+          cd sphinx/ &&
+          pip3 install -r requirements.txt &&
+          make html
+      - name: Deploy Preview 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./sphinx/build/html
+          destination_dir: sphinx-preview/${{ github.sha }}
