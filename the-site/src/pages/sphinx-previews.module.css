@@ -1,0 +1,51 @@
+.previewList {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.previewItem {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: var(--ifm-background-surface-color);
+}
+
+.previewItem h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.previewItem h3 a {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+.previewItem h3 a:hover {
+  text-decoration: underline;
+}
+
+.commitMessage {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.commitMeta {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.previewUrl {
+  margin: 0.75rem 0 0 0;
+  font-size: 0.875rem;
+}
+
+.previewUrl code {
+  background: var(--ifm-code-background);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}
