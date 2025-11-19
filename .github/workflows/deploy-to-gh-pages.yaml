@@ -9,7 +9,9 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -19,11 +21,45 @@ concurrency:
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      # 👇 Build steps
+      
+      # 👇 Sphinx build steps
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: Setup Graphviz
+        uses: tlylt/install-graphviz@v1
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      
+      - name: Build Sphinx Documentation
+        run: |
+          python -m venv env &&
+          source env/bin/activate &&
+          echo "VIRTUAL ENV:" $VIRTUAL_ENV &&
+          cd sphinx/ &&
+          pip3 install -r requirements.txt &&
+          make html
+      
+      - name: Copy Sphinx output to Docusaurus static folder
+        run: |
+          mkdir -p the-site/static/sphinx
+          cp -r sphinx/build/html/* the-site/static/sphinx/
+      # 👆 Sphinx build steps
+      
+      # 👇 Docusaurus build steps
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -37,10 +73,13 @@ jobs:
         run: npm run build
         working-directory: ./the-site
       # 👆 Build steps
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./the-site/build
-          publish_branch: gh-pages
-          keep_files: true
+          # 👇 Specify build output path
+          path: the-site/build
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
