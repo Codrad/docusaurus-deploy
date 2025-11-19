@@ -17,6 +17,8 @@ concurrency:
 jobs:
   deploy-sphinx-only:
     runs-on: ubuntu-latest
+    env:
+      VERSION: 'v-${{ github.run_number }}'
     steps:
       - uses: actions/checkout@v4
       
@@ -50,6 +52,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./sphinx/build/html
-          destination_dir: sphinx-preview/${{ github.sha }}
+          destination_dir: sphinx-preview/${{ env.VERSION }}
           publish_branch: gh-pages
           keep_files: true
