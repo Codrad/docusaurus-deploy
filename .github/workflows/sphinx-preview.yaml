@@ -19,13 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          
-      - name: Checkout sphinx source from current branch
-        uses: actions/checkout@v4
-        with:
-          path: source-repo
       
       # 👇 Sphinx build steps only
       - name: Setup Java
@@ -47,18 +40,16 @@ jobs:
           python -m venv env &&
           source env/bin/activate &&
           echo "VIRTUAL ENV:" $VIRTUAL_ENV &&
-          cd source-repo/sphinx/ &&
+          cd sphinx/ &&
           pip3 install -r requirements.txt &&
           make html
       # 👆 Sphinx build steps
       
-      - name: Update sphinx folder in gh-pages
-        run: |
-          rm -rf sphinx
-          mkdir -p sphinx
-          cp -r source-repo/sphinx/build/html/* sphinx/
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add sphinx
-          git commit -m "Update sphinx documentation from ${{ github.sha }}" || echo "No changes to commit"
-          git push
+      - name: Deploy Sphinx to /sphinx subdirectory
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./sphinx/build/html
+          destination_dir: sphinx
+          publish_branch: gh-pages
+          keep_files: true
