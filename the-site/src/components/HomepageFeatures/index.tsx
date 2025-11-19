@@ -35,7 +35,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        View our Sphinx documentation and <a href="/sphinx-previews">preview builds</a>.
+        View our Sphinx documentation and <a href="docusaurus-deploy/sphinx-previews">preview builds</a>.
         Each preview is generated from commits to provide isolated testing environments.
       </>
     ),
