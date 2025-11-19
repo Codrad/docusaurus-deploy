@@ -19,13 +19,34 @@ export default function SphinxPreviews() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('https://api.github.com/repos/Codrad/docusaurus-deploy/commits?sha=sphinx-preview&per_page=20')
+    // Fetch commits from sphinx-preview branch
+    const commitsPromise = fetch('https://api.github.com/repos/Codrad/docusaurus-deploy/commits?sha=sphinx-preview&per_page=50')
       .then(response => {
         if (!response.ok) throw new Error('Failed to fetch commits');
         return response.json();
+      });
+
+    // Fetch directory listing from gh-pages branch to see what actually exists
+    const dirPromise = fetch('https://api.github.com/repos/Codrad/docusaurus-deploy/contents/sphinx-preview?ref=gh-pages')
+      .then(response => {
+        if (!response.ok) return [];
+        return response.json();
       })
-      .then(data => {
-        setCommits(data);
+      .catch(() => []);
+
+    Promise.all([commitsPromise, dirPromise])
+      .then(([commitsData, dirData]) => {
+        // Get list of existing SHAs from the directory
+        const existingShas = new Set(
+          Array.isArray(dirData) ? dirData.map((item: any) => item.name) : []
+        );
+        
+        // Filter commits to only include those with deployed previews
+        const filteredCommits = commitsData.filter((commit: Commit) => 
+          existingShas.has(commit.sha)
+        );
+        
+        setCommits(filteredCommits);
         setLoading(false);
       })
       .catch(err => {
@@ -66,7 +87,13 @@ export default function SphinxPreviews() {
                   <span>Date: {new Date(commit.commit.author.date).toLocaleString()}</span>
                 </p>
                 <p className={styles.previewUrl}>
-                  <code>https://codrad.github.io/docusaurus-deploy/sphinx-preview/{commit.sha}/</code>
+                  <a 
+                    href={`https://codrad.github.io/docusaurus-deploy/sphinx-preview/${commit.sha}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    https://codrad.github.io/docusaurus-deploy/sphinx-preview/{commit.sha}/
+                  </a>
                 </p>
               </div>
             ))}
